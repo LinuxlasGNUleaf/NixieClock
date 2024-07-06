@@ -6,3 +6,4 @@
 
 void sendDigits(PCF8575 expander, byte low_val, byte high_val);
 void rotateAllDigits();
+void disableAllDigits();
