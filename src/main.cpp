@@ -5,6 +5,8 @@ PCF8575 minPCF(0x22);
 PCF8575 secPCF(0x20);
 
 RTC_DS1307 rtc;
+DateTime current;
+TimeSpan second(1);
 
 void setup()
 {
@@ -21,6 +23,7 @@ void setup()
   }
   if (!rtc.isrunning())
     Serial.println("Clock is not running!");
+  current = rtc.now();
 
   Serial.println("Connecting to PCFs...");
   if (!hourPCF.isConnected())
@@ -38,10 +41,14 @@ void setup()
   rotateAllDigits();
   Serial.println("done.");
   disableAllDigits();
+  delay(1000);
 }
 
 void loop()
 {
+  displayCurrentTime(current);
+  current = current+second;
+  delay(1000);
 }
 
 void sendDigits(PCF8575 expander, byte low_val, byte high_val)
@@ -65,4 +72,14 @@ void disableAllDigits()
   sendDigits(hourPCF,0x1F,0x1F);
   sendDigits(minPCF,0x1F,0x1F);
   sendDigits(secPCF,0x1F,0x1F);
+}
+
+void displayCurrentTime(DateTime current)
+{
+  int hours = current.hour();
+  int mins = current.minute();
+  int secs = current.second();
+  sendDigits(hourPCF, hours%10, hours/10);
+  sendDigits(minPCF, mins%10, mins/10);
+  sendDigits(secPCF, secs%10, secs/10);
 }
